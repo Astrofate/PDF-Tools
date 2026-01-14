@@ -1,0 +1,57 @@
+import fitz
+import math
+
+input_pdf = "input.pdf"
+output_pdf = "output_A4_vector.pdf"
+
+doc = fitz.open(input_pdf)
+src_page = doc[0]
+
+# Original page size
+page_width = src_page.rect.width
+page_height = src_page.rect.height
+
+# A4 size in points (PDF units)
+A4_WIDTH = 595
+A4_HEIGHT = 842
+
+scale = A4_WIDTH / page_width
+OVERLAP_MM = 8
+
+# Convert mm → PDF points
+OVERLAP_PT = OVERLAP_MM * 72 / 25.4
+
+slice_height = (A4_HEIGHT - OVERLAP_PT) / scale
+num_slices = math.ceil((page_height - OVERLAP_PT) / slice_height)
+
+out = fitz.open()
+
+for i in range(num_slices):
+    y0 = max(0, i * slice_height - OVERLAP_PT / scale)
+    y1 = min(y0 + slice_height + OVERLAP_PT / scale, page_height)
+
+    # Create new A4 page
+    new_page = out.new_page(width=A4_WIDTH, height=A4_HEIGHT)
+
+    clip = fitz.Rect(0, y0, page_width, y1)
+
+    clip_height = clip.height
+    target_height = clip_height * scale
+
+    # Place content aligned to TOP instead of centered
+    target_rect = fitz.Rect(
+        0,
+        0,
+        A4_WIDTH,
+        target_height,
+    )
+
+    new_page.show_pdf_page(
+        target_rect,
+        doc,
+        0,
+        clip=clip
+    )
+
+out.save(output_pdf)
+print("✅ Done! Saved as", output_pdf)

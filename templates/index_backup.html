@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to A4 Splitter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            background: #fafafa;
+            color: #1a1a1a;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+
+        body.dark {
+            background: #0f0f0f;
+            color: #eaeaea;
+        }
+
+        /* HEADER */
+        .header {
+            border-bottom: 1px solid #e5e5e5;
+            padding: 16px 24px;
+            background: #fff;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        body.dark .header {
+            background: #121212;
+            border-bottom-color: #2a2a2a;
+        }
+
+        .header-content {
+            max-width: 480px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-title {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .app-title h1 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .app-subtitle {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            background: #f0f0f0;
+            color: #1a1a1a;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            padding: 4px 8px;
+            min-width: 60px;
+        }
+
+        body.dark .theme-toggle {
+            background: #1a1a1a;
+            color: #eaeaea;
+        }
+
+        .theme-toggle:hover {
+            background: #e0e0e0;
+            transform: scale(1.05);
+        }
+
+        body.dark .theme-toggle:hover {
+            background: #2a2a2a;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 24px 16px;
+            }
+        }
+
+        /* FORM */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 500;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            opacity: 0.65;
+        }
+
+        input[type="file"],
+        input[type="number"] {
+            padding: 14px 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        body.dark input[type="file"],
+        body.dark input[type="number"] {
+            background: #1a1a1a;
+            color: #eaeaea;
+        }
+
+        input[type="file"]:hover,
+        input[type="number"]:hover {
+            background: #f0f0f0;
+        }
+
+        body.dark input[type="file"]:hover,
+        body.dark input[type="number"]:hover {
+            background: #222;
+        }
+
+        input[type="file"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark input[type="file"]:focus,
+        body.dark input[type="number"]:focus {
+            background: #1f1f1f;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        /* BUTTONS */
+        button {
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            padding: 12px 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        /* Primary Button (Convert) */
+        .btn-primary {
+            background: #000;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1a1a1a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+            transform: translateY(-1px);
+        }
+
+        body.dark .btn-primary {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark .btn-primary:hover:not(:disabled) {
+            background: #f5f5f5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Secondary Button (Cancel, Reset) */
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #1a1a1a;
+            border: 1px solid transparent;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #e5e5e5;
+        }
+
+        body.dark .btn-secondary {
+            background: #1a1a1a;
+            color: #eaeaea;
+        }
+
+        body.dark .btn-secondary:hover:not(:disabled) {
+            background: #252525;
+        }
+
+        /* Success Button (Download) */
+        .btn-success {
+            background: #000;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+            flex: 1;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #1a1a1a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+            transform: translateY(-1px);
+        }
+
+        body.dark .btn-success {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark .btn-success:hover:not(:disabled) {
+            background: #f5f5f5;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-buttons button {
+            flex: 1;
+        }
+
+        /* PROGRESS SECTION */
+        #progressSection {
+            display: block;
+        }
+
+        .progress-container {
+            margin-bottom: 24px;
+        }
+
+        progress {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            border: none;
+            background: #e5e5e5;
+            overflow: hidden;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        body.dark progress {
+            background: #2a2a2a;
+        }
+
+        progress::-webkit-progress-bar {
+            background: #e5e5e5;
+            border-radius: 3px;
+        }
+
+        body.dark progress::-webkit-progress-bar {
+            background: #2a2a2a;
+        }
+
+        progress::-webkit-progress-value {
+            background: #000;
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        body.dark progress::-webkit-progress-value {
+            background: #fff;
+        }
+
+        progress::-moz-progress-bar {
+            background: #000;
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        body.dark progress::-moz-progress-bar {
+            background: #fff;
+        }
+
+        .divider {
+            height: 1px;
+            background: #d0d0d0;
+            margin: 20px 0;
+        }
+
+        body.dark .divider {
+            background: #404040;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 13px;
+            margin-top: 12px;
+            padding: 0;
+            background: transparent;
+            display: none;
+            line-height: 1.5;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* RESULT CARD */
+        .result-card {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        body.dark .result-card {
+            background: #1a1a1a;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-card-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .result-card-content {
+            font-size: 13px;
+            opacity: 0.75;
+            line-height: 1.6;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .button-row button {
+            flex: 1;
+        }
+
+        .button-row .btn-secondary {
+            flex: 0 0 auto;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 640px) {
+            .header {
+                padding: 12px 16px;
+            }
+
+            .header-content {
+                max-width: 100%;
+            }
+
+            .app-title h1 {
+                font-size: 16px;
+            }
+
+            .app-subtitle {
+                font-size: 11px;
+            }
+
+            .container {
+                padding: 24px 16px;
+            }
+
+            button {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+
+            .result-card {
+                padding: 16px;
+            }
+
+            .result-card-title {
+                font-size: 14px;
+            }
+
+            .result-card-content {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div style="font-size: 24px;">📄</div>
+                <div class="app-title">
+                    <h1>PDF to A4</h1>
+                    <p class="app-subtitle">Split & Print</p>
+                </div>
+            </div>
+            <button class="theme-toggle" onclick="toggleDark()" title="Toggle dark mode">Dark</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+        <!-- FORM -->
+        <form id="form">
+            <div class="form-group">
+                <label for="pdf">PDF File</label>
+                <input type="file" id="pdf" accept=".pdf" required>
+            </div>
+
+            <div class="form-group">
+                <label for="overlap">Overlap (mm)</label>
+                <input type="number" id="overlap" value="8" min="0" max="50">
+            </div>
+
+            <div class="form-group">
+                <label for="dpi">DPI (72-600)</label>
+                <input type="number" id="dpi" value="300" min="72" max="600">
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit" id="submitBtn" class="btn-primary">Convert</button>
+                <button type="button" id="cancelBtn" onclick="cancelJob()" disabled class="btn-secondary">Cancel</button>
+            </div>
+        </form>
+
+        <!-- PROGRESS SECTION - ALWAYS VISIBLE -->
+        <div id="progressSection">
+            <div class="progress-container">
+                <progress id="bar" value="0" max="100"></progress>
+            </div>
+
+            <!-- RESULT CARD - ALWAYS VISIBLE, CONTENT UPDATES DYNAMICALLY -->
+            <div class="result-card">
+                <div class="result-card-title" id="cardTitle">Ready to convert</div>
+                <div class="result-card-content">
+                    <p id="cardStatus">Upload a PDF to begin</p>
+                    <p id="cardDetails" style="margin-top: 8px; display: none;"></p>
+                    <div id="error" class="error-message" style="margin-top: 8px;"></div>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button onclick="download()" id="downloadBtn" disabled class="btn-success">Download</button>
+                <button type="button" onclick="reset()" id="resetBtn" class="btn-secondary">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("form");
+        const bar = document.getElementById("bar");
+        const cardTitle = document.getElementById("cardTitle");
+        const cardStatus = document.getElementById("cardStatus");
+        const cardDetails = document.getElementById("cardDetails");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const cancelBtn = document.getElementById("cancelBtn");
+        const submitBtn = document.getElementById("submitBtn");
+        const progressSection = document.getElementById("progressSection");
+        const errorDiv = document.getElementById("error");
+
+        let pollTimer = null;
+        let estimateData = null;
+        let isEstimating = false;
+        let isProcessing = false;
+        let isSubmitting = false;  // Prevent duplicate form submissions
+
+        // ============== UPDATE CARD DISPLAY ==============
+        function updateCard(title, status, details = "", showError = false) {
+            cardTitle.innerText = title;
+            cardStatus.innerText = status;
+            if (details) {
+                cardDetails.innerText = details;
+                cardDetails.style.display = "block";
+            } else {
+                cardDetails.style.display = "none";
+            }
+            if (showError) {
+                errorDiv.style.display = "block";
+            } else {
+                errorDiv.classList.remove("show");
+            }
+        }
+
+        // ============== FILE INPUT CHANGE ==============
+        document.getElementById("pdf").addEventListener("change", async (e) => {
+            const pdf = e.target.files[0];
+            if (!pdf) return;
+
+            // Prevent multiple concurrent estimates
+            if (isEstimating) return;
+            isEstimating = true;
+
+            const overlap = document.getElementById("overlap").value;
+            const dpi = document.getElementById("dpi").value;
+
+            // Show estimating status
+            updateCard("Estimating…", "Calculating pages and size...");
+            bar.value = 0;
+            errorDiv.classList.remove("show");
+
+            const formData = new FormData();
+            formData.append("pdf", pdf);
+            formData.append("overlap", overlap);
+            formData.append("dpi", dpi);
+
+            try {
+                // Calculate estimate only (don't start conversion)
+                const estRes = await fetch("/estimate", { method: "POST", body: formData });
+
+                if (!estRes.ok) {
+                    const data = await estRes.json();
+                    throw new Error(data.error || "Estimation failed");
+                }
+
+                const est = await estRes.json();
+                estimateData = est;
+                updateCard("Ready to Convert", `Input: ${est.pages} pages | ${est.size}`);
+
+            } catch (err) {
+                updateCard("Estimation Failed", err.message, "", true);
+            } finally {
+                isEstimating = false;
+            }
+        });
+
+        // ============== FORM SUBMIT ==============
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            // Prevent duplicate submissions
+            if (isSubmitting || isProcessing) {
+                console.warn("Conversion already in progress, ignoring duplicate request");
+                return;
+            }
+
+            const pdf = document.getElementById("pdf").files[0];
+            const overlap = document.getElementById("overlap").value;
+            const dpi = document.getElementById("dpi").value;
+
+            // Validate
+            if (!pdf) {
+                updateCard("Validation Error", "Please select a PDF file", "", true);
+                return;
+            }
+
+            if (!estimateData) {
+                updateCard("Validation Error", "Please wait for estimate to complete", "", true);
+                return;
+            }
+
+            if (overlap < 0 || overlap > 50) {
+                updateCard("Validation Error", "Overlap must be between 0-50 mm", "", true);
+                return;
+            }
+
+            if (dpi < 72 || dpi > 600) {
+                updateCard("Validation Error", "DPI must be between 72-600", "", true);
+                return;
+            }
+
+            // Mark as submitting and processing
+            isSubmitting = true;
+            isProcessing = true;
+            
+            // Update UI for conversion start - disable Convert button
+            submitBtn.disabled = true;
+            cancelBtn.disabled = false;
+            errorDiv.classList.remove("show");
+            bar.value = 0;
+            updateCard("Processing…", "Starting conversion");
+
+            const formData = new FormData();
+            formData.append("pdf", pdf);
+            formData.append("overlap", overlap);
+            formData.append("dpi", dpi);
+
+            try {
+                // Upload and start conversion
+                const uploadRes = await fetch("/upload", { method: "POST", body: formData });
+
+                if (!uploadRes.ok) {
+                    const data = await uploadRes.json();
+                    throw new Error(data.error || "Upload failed");
+                }
+
+                // Start progress polling
+                pollProgress();
+
+            } catch (err) {
+                updateCard("Conversion Failed", err.message, "", true);
+                // Keep Convert button disabled until Reset is clicked
+                cancelBtn.disabled = true;
+                isProcessing = false;
+                isSubmitting = false;
+            }
+        });
+
+        // ============== PROGRESS POLLING ==============
+        function pollProgress() {
+            pollTimer = setInterval(async () => {
+                try {
+                    const res = await fetch("/progress");
+                    if (!res.ok) throw new Error("Progress fetch failed");
+
+                    const state = await res.json();
+
+                    // Update progress bar
+                    bar.value = state.percent;
+
+                    // Show live progress
+                    updateCard(
+                        "Processing…",
+                        `${state.percent}% complete`,
+                        `Input: ${estimateData.pages} pages | ${estimateData.size}`
+                    );
+
+                    // Show errors if any
+                    if (state.error) {
+                        errorDiv.innerText = state.error;
+                        errorDiv.classList.add("show");
+                    }
+
+                    // Handle completion
+                    if (state.percent >= 100) {
+                        clearInterval(pollTimer);
+                        bar.value = 100;
+                        downloadBtn.disabled = false;
+                        cancelBtn.disabled = true;
+                        // Keep Convert button disabled until Reset is clicked
+                        isProcessing = false;
+                        isSubmitting = false;
+                        
+                        // Show output file size and actual page count from backend
+                        const outputSize = state.output_size || "Unknown";
+                        const outputPages = state.output_pages || estimateData.pages;
+                        updateCard(
+                            "Download Ready",
+                            "Conversion complete",
+                            `Output: ${outputPages} pages | ${outputSize}`
+                        );
+                    }
+
+                    // Handle cancellation
+                    if (state.status === "Cancelled") {
+                        clearInterval(pollTimer);
+                        cancelBtn.disabled = true;
+                        submitBtn.disabled = false;
+                        isProcessing = false;
+                        isSubmitting = false;
+                        bar.value = 0;
+                        updateCard("Cancelled", "Conversion was cancelled");
+                    }
+
+                } catch (err) {
+                    console.error("Poll error:", err);
+                }
+            }, 500);
+        }
+
+        // ============== CANCEL ==============
+        function cancelJob() {
+            fetch("/cancel", { method: "POST" })
+                .then(() => {
+                    // Stop polling
+                    if (pollTimer) clearInterval(pollTimer);
+                    
+                    // Disable Cancel button
+                    cancelBtn.disabled = true;
+                    
+                    // Re-enable Convert button (keep inputs intact)
+                    submitBtn.disabled = false;
+                    
+                    // Reset progress bar
+                    bar.value = 0;
+                    
+                    // Clear error display
+                    errorDiv.style.display = "none";
+                    
+                    // Reset flags
+                    isProcessing = false;
+                    isSubmitting = false;
+                    
+                    // Disable download button
+                    downloadBtn.disabled = true;
+                    
+                    // Update status - show cancellation message
+                    updateCard(
+                        "Conversion cancelled",
+                        "Ready to convert again",
+                        estimateData ? `Input: ${estimateData.pages} pages | ${estimateData.size}` : ""
+                    );
+                })
+                .catch(err => console.error("Cancel error:", err));
+        }
+
+        // ============== DOWNLOAD ==============
+        function download() {
+            window.location = "/download";
+        }
+
+        // ============== RESET ==============
+        function reset() {
+            form.reset();
+            bar.value = 0;
+            errorDiv.classList.remove("show");
+            downloadBtn.disabled = true;
+            submitBtn.disabled = false;  // Re-enable Convert button
+            cancelBtn.disabled = true;
+            estimateData = null;
+            isProcessing = false;
+            isSubmitting = false;
+            updateCard("Ready to convert", "Upload a PDF to begin");
+        }
+
+        // ============== ERROR HANDLING ==============
+        function showError(message) {
+            errorDiv.innerText = message;
+            errorDiv.classList.add("show");
+        }
+
+        // ============== DARK MODE ==============
+        function toggleDark() {
+            document.body.classList.toggle("dark");
+            const isDark = document.body.classList.contains("dark");
+            localStorage.setItem("darkMode", isDark);
+            // Update button text
+            document.querySelector(".theme-toggle").innerText = isDark ? "Light" : "Dark";
+        }
+
+        // ============== INITIALIZATION ==============
+        // Restore dark mode preference
+        if (localStorage.getItem("darkMode") === "true") {
+            document.body.classList.add("dark");
+            document.querySelector(".theme-toggle").innerText = "Light";
+        } else {
+            document.querySelector(".theme-toggle").innerText = "Dark";
+        }
+    </script>
+
+</body>
+</html>
