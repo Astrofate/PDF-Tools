@@ -108,10 +108,16 @@ def estimate():
 
         overlap = float(request.form.get("overlap", 8))
         dpi = int(request.form.get("dpi", 300))
+        paper_format = request.form.get("paper_format", "A4")
 
         # Validate parameters
         if overlap < 0 or overlap > 50 or dpi < 72 or dpi > 600:
             return {"error": "Invalid overlap or DPI"}, 400
+            
+        # Validate paper format (basic check, split_pdf handles detailed check)
+        valid_formats = ["A2", "A3", "A4", "A5", "Letter"]
+        if paper_format not in valid_formats:
+            return {"error": "Invalid paper format"}, 400
 
         # Save temp file to get metadata
         temp_file = os.path.join(TEMP_DIR, "temp_estimate.pdf")
@@ -155,11 +161,17 @@ def upload():
 
         overlap = float(request.form.get("overlap", 8))
         dpi = int(request.form.get("dpi", 300))
+        paper_format = request.form.get("paper_format", "A4")
 
         # Validate parameters
         if overlap < 0 or dpi < 72 or dpi > 600:
             conversion_lock.release()
             return {"error": "Invalid overlap or DPI"}, 400
+            
+        valid_formats = ["A2", "A3", "A4", "A5", "Letter"]
+        if paper_format not in valid_formats:
+            conversion_lock.release()
+            return {"error": "Invalid paper format"}, 400
 
         # Reset state and save file
         with state_lock:
@@ -178,7 +190,7 @@ def upload():
         # Start worker thread
         thread = threading.Thread(
             target=run_conversion,
-            args=(overlap, dpi),
+            args=(overlap, dpi, paper_format),
             daemon=False
         )
         thread.start()
@@ -215,7 +227,7 @@ def download():
 
 
 # ============== WORKER THREAD ==============
-def run_conversion(overlap, dpi):
+def run_conversion(overlap, dpi, paper_format):
     """Background worker - runs in thread."""
     try:
         if not os.path.exists(INPUT_FILE):
@@ -232,6 +244,7 @@ def run_conversion(overlap, dpi):
             INPUT_FILE,
             overlap=overlap,
             dpi=dpi,
+            paper_format=paper_format,
             progress_callback=progress_cb,
             cancel_check=should_cancel
         )

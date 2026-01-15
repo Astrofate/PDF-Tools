@@ -5,28 +5,36 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 # ============== CONSTANTS ==============
-A4_WIDTH = 595    # Points (72 DPI)
-A4_HEIGHT = 842   # Points (72 DPI)
+# Dimensions in points (72 DPI)
+PAPER_FORMATS = {
+    "A2": {"width": 1191, "height": 1684},
+    "A3": {"width": 842, "height": 1191},
+    "A4": {"width": 595, "height": 842},
+    "A5": {"width": 420, "height": 595},
+    "Letter": {"width": 612, "height": 792}
+}
 
 
 # ============== CORE LOGIC ==============
-def calculate_slices(page_width, page_height, overlap_mm):
+def calculate_slices(page_width, page_height, overlap_mm, target_width, target_height):
     """
-    Calculate how many A4 pages needed to cover the source page.
+    Calculate how many target pages needed to cover the source page.
     
     Args:
         page_width: Source page width in points
         page_height: Source page height in points
         overlap_mm: Overlap amount in millimeters
+        target_width: Target page width in points
+        target_height: Target page height in points
     
     Returns:
         (num_slices, scale_factor, overlap_in_points)
     """
-    scale = A4_WIDTH / page_width
+    scale = target_width / page_width
     overlap_pt = overlap_mm * 72 / 25.4  # Convert mm to points
     
-    # How much vertical space each A4 page covers (minus overlap)
-    slice_height = (A4_HEIGHT - overlap_pt) / scale
+    # How much vertical space each target page covers (minus overlap)
+    slice_height = (target_height - overlap_pt) / scale
     
     # How many slices needed
     num_slices = math.ceil((page_height - overlap_pt) / slice_height)
@@ -39,17 +47,19 @@ def split_pdf(
     input_path,
     overlap=8,
     dpi=300,
+    paper_format="A4",
     progress_callback=None,
     cancel_check=None
 ):
     """
-    Split a PDF into multiple A4 pages with optional overlap.
+    Split a PDF into multiple pages of specified format with optional overlap.
     
     Args:
         output_path: Path to save output PDF
         input_path: Path to source PDF
         overlap: Overlap in millimeters (default 8)
         dpi: DPI for rendering (72-600, default 300)
+        paper_format: Target paper format (default "A4")
         progress_callback: Function(percent, status_msg) for progress updates
         cancel_check: Function() -> bool to check if cancellation requested
     
@@ -60,6 +70,15 @@ def split_pdf(
     out = None
     
     try:
+        # Get target dimensions
+        if paper_format not in PAPER_FORMATS:
+            logging.warning(f"Unknown paper format {paper_format}, defaulting to A4")
+            paper_format = "A4"
+            
+        target_dims = PAPER_FORMATS[paper_format]
+        target_w = target_dims["width"]
+        target_h = target_dims["height"]
+        
         # Open source document
         doc = fitz.open(input_path)
         if doc.page_count == 0:
@@ -72,11 +91,11 @@ def split_pdf(
         
         # Calculate slicing parameters
         num_slices, scale, overlap_pt = calculate_slices(
-            page_width, page_height, overlap
+            page_width, page_height, overlap, target_w, target_h
         )
         
         # Calculate actual slice height
-        slice_height = (A4_HEIGHT - overlap_pt) / scale
+        slice_height = (target_h - overlap_pt) / scale
         
         # Create output document
         out = fitz.open()
@@ -98,8 +117,8 @@ def split_pdf(
             y0 = max(0, i * slice_height - overlap_pt / scale)
             y1 = min(y0 + slice_height + overlap_pt / scale, page_height)
             
-            # Create new A4 page
-            new_page = out.new_page(width=A4_WIDTH, height=A4_HEIGHT)
+            # Create new page
+            new_page = out.new_page(width=target_w, height=target_h)
             
             # Define clip region from source
             clip = fitz.Rect(0, y0, page_width, y1)
@@ -109,7 +128,7 @@ def split_pdf(
             target_height = clip_height * scale
             
             # Place content at TOP of page (not centered)
-            target_rect = fitz.Rect(0, 0, A4_WIDTH, target_height)
+            target_rect = fitz.Rect(0, 0, target_w, target_height)
             
             # Render clipped portion onto new page
             new_page.show_pdf_page(

@@ -4,12 +4,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF to A4 Splitter</title>
+    <title>PDF Splitter</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <style>
+        :root {
+            /* Palette Definition */
+            --const-bright-green: #beef00;
+            --const-electric-red: #ff0028;
+            --const-deep-green: #657a00;
+            --const-power-blue: #1400c6;
+            --const-white: #ffffff;
+            --const-black: #000000;
+
+            /* Light Theme Mapping (Default) */
+            --bg-color: #fafafa;
+            --surface-color: #ffffff;
+            --surface-secondary: #f5f5f5;
+            --text-color: #1a1a1a;
+            --text-secondary: rgba(26, 26, 26, 0.6);
+            --border-color: #d0d0d0;
+            --primary-accent: var(--const-power-blue);
+            --secondary-accent: var(--const-deep-green);
+            --error-color: var(--const-electric-red);
+            --button-text-primary: var(--const-white);
+            --button-text-active: var(--const-white);
+            --active-item-bg: var(--const-black);
+            --active-item-text: var(--const-white);
+        }
+
+        body.dark {
+            /* Dark Theme Mapping */
+            --bg-color: #0f0f0f;
+            --surface-color: #121212;
+            --surface-secondary: #1a1a1a;
+            --text-color: #eaeaea;
+            --text-secondary: rgba(234, 234, 234, 0.6);
+            --border-color: #404040;
+            --primary-accent: var(--const-bright-green);
+            /* High contrast for dark mode */
+            --secondary-accent: var(--const-deep-green);
+            --error-color: var(--const-electric-red);
+            --button-text-primary: var(--const-black);
+            /* Text on bright green */
+            --button-text-active: var(--const-black);
+            --active-item-bg: var(--const-white);
+            --active-item-text: var(--const-black);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -18,37 +62,34 @@
 
         body {
             font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
-            background: #fafafa;
-            color: #1a1a1a;
+            background: var(--bg-color);
+            color: var(--text-color);
             transition: background-color 0.3s ease, color 0.3s ease;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
-        body.dark {
-            background: #0f0f0f;
-            color: #eaeaea;
-        }
-
         /* HEADER */
         .header {
-            border-bottom: 1px solid #e5e5e5;
+            border-bottom: 1px solid var(--surface-secondary);
             padding: 16px 24px;
-            background: #fff;
+            background: var(--const-power-blue);
+            color: var(--const-white);
             transition: background-color 0.3s ease, border-color 0.3s ease;
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom-color: transparent;
         }
 
         body.dark .header {
-            background: #121212;
-            border-bottom-color: #2a2a2a;
+            background: var(--const-bright-green);
+            color: var(--const-black);
         }
 
         .header-content {
-            max-width: 480px;
+            max-width: 100%;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -74,8 +115,10 @@
         }
 
         .app-subtitle {
-            font-size: 12px;
-            opacity: 0.6;
+            font-size: 13px;
+            opacity: 0.7;
+            max-width: 400px;
+            line-height: 1.4;
         }
 
         /* ============== UNIFIED BUTTON SYSTEM ============== */
@@ -110,10 +153,10 @@
         .theme-toggle {
             min-width: 80px;
             height: 48px;
-            border: 1.5px solid #d0d0d0;
+            border: 1.5px solid var(--border-color);
             border-radius: 10px;
-            background: #f5f5f5;
-            color: #1a1a1a;
+            background: var(--surface-secondary);
+            color: var(--text-color);
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
@@ -126,20 +169,12 @@
             letter-spacing: 0.3px;
         }
 
-        body.dark .theme-toggle {
-            background: #1a1a1a;
-            color: #eaeaea;
-            border-color: #404040;
-        }
-
         .theme-toggle:hover {
-            background: #f0f0f0;
-            border-color: #b0b0b0;
+            filter: brightness(0.95);
         }
 
         body.dark .theme-toggle:hover {
-            background: #1f1f1f;
-            border-color: #505050;
+            filter: brightness(1.1);
         }
 
         /* MAIN CONTAINER */
@@ -175,6 +210,7 @@
             text-transform: uppercase;
             letter-spacing: 0.4px;
             opacity: 0.65;
+            color: var(--text-color);
         }
 
         /* HIDDEN FILE INPUT - Native control hidden */
@@ -190,10 +226,10 @@
 
         .file-upload-area {
             padding: 12px 16px;
-            border: 1.5px solid #d0d0d0;
+            border: 1.5px solid var(--border-color);
             border-radius: 10px;
-            background: #f5f5f5;
-            color: #1a1a1a;
+            background: var(--surface-secondary);
+            color: var(--text-color);
             height: 48px;
             display: flex;
             align-items: center;
@@ -206,33 +242,23 @@
             user-select: none;
         }
 
-        body.dark .file-upload-area {
-            background: #1a1a1a;
-            color: #eaeaea;
-            border-color: #404040;
-        }
-
         .file-upload-area:hover {
-            background: #f0f0f0;
-            border-color: #b0b0b0;
+            filter: brightness(0.95);
         }
 
         body.dark .file-upload-area:hover {
-            background: #1f1f1f;
-            border-color: #505050;
+            filter: brightness(1.1);
         }
 
         .file-upload-area:focus-within {
             outline: none;
-            background: #fff;
-            border-color: #000;
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+            background: var(--surface-color);
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 2px rgba(20, 0, 198, 0.1);
         }
 
         body.dark .file-upload-area:focus-within {
-            background: #222;
-            border-color: #fff;
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 2px rgba(190, 239, 0, 0.1);
         }
 
         .file-upload-text {
@@ -310,16 +336,12 @@
             gap: 0;
             align-items: center;
             justify-content: flex-start;
-            border: 1px solid #d0d0d0;
+            border: 1.5px solid var(--border-color);
             border-radius: 12px;
             padding: 0;
             background: transparent;
             width: 100%;
             max-width: 180px;
-        }
-
-        body.dark .overlap-control {
-            border-color: #404040;
         }
 
         .overlap-value {
@@ -328,8 +350,8 @@
             font-weight: 600;
             font-size: 16px;
             padding: 12px 16px;
-            background: #f5f5f5;
-            border-right: 1.5px solid #d0d0d0;
+            background: var(--surface-secondary);
+            border-right: 1.5px solid var(--border-color);
             border-top-left-radius: 10px;
             border-bottom-left-radius: 10px;
             height: 48px;
@@ -337,19 +359,15 @@
             align-items: center;
             justify-content: center;
             letter-spacing: 0.2px;
-        }
-
-        body.dark .overlap-value {
-            background: #1a1a1a;
-            border-right-color: #404040;
+            color: var(--text-color);
         }
 
         .overlap-btn {
             width: 48px;
             height: 48px;
             border: none;
-            background: #f5f5f5;
-            color: #1a1a1a;
+            background: var(--surface-secondary);
+            color: var(--text-color);
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
@@ -359,13 +377,7 @@
             align-items: center;
             justify-content: center;
             flex: 0 0 48px;
-            border-right: 1.5px solid #d0d0d0;
-        }
-
-        body.dark .overlap-btn {
-            background: #1a1a1a;
-            color: #eaeaea;
-            border-right-color: #404040;
+            border-right: 1.5px solid var(--border-color);
         }
 
         .overlap-btn:last-child {
@@ -375,18 +387,20 @@
         }
 
         .overlap-btn:hover:not(:disabled) {
-            background: #f0f0f0;
-            border-right-color: #b0b0b0;
+            filter: brightness(0.95);
         }
 
         body.dark .overlap-btn:hover:not(:disabled) {
-            background: #1f1f1f;
-            border-right-color: #505050;
+            filter: brightness(1.1);
         }
 
         .overlap-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .overlap-btn:active:not(:disabled) {
+            transform: none;
         }
 
         /* DPI QUALITY PRESETS */
@@ -408,6 +422,7 @@
             text-transform: uppercase;
             letter-spacing: 0.4px;
             opacity: 0.65;
+            color: var(--text-color);
         }
 
         .dpi-input-wrapper {
@@ -423,11 +438,12 @@
             padding: 4px 8px;
             font-weight: 600;
             font-size: 14px;
-            background: #f0f0f0;
-            border: 1px solid #d0d0d0;
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             text-align: center;
             transition: all 0.2s ease;
+            color: var(--text-color);
         }
 
         /* Remove spinner arrows for Chrome, Edge, Safari */
@@ -442,33 +458,14 @@
             -moz-appearance: textfield;
         }
 
-        body.dark .dpi-input-wrapper input {
-            background: #1a1a1a;
-            border-color: #404040;
-            color: #eaeaea;
-        }
-
         .dpi-input-wrapper input:hover {
-            background: #f5f5f5;
-            border-color: #c0c0c0;
-        }
-
-        body.dark .dpi-input-wrapper input:hover {
-            background: #1f1f1f;
-            border-color: #505050;
+            filter: brightness(0.95);
         }
 
         .dpi-input-wrapper input:focus {
             outline: none;
-            background: #fff;
-            border-color: #000;
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-        }
-
-        body.dark .dpi-input-wrapper input:focus {
-            background: #222;
-            border-color: #fff;
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+            background: var(--surface-color);
+            border-color: var(--primary-accent);
         }
 
         .dpi-input-wrapper label {
@@ -476,6 +473,7 @@
             font-weight: 500;
             opacity: 0.7;
             white-space: nowrap;
+            color: var(--text-color);
         }
 
         .preset-buttons {
@@ -490,9 +488,9 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-            border: 1.5px solid #d0d0d0;
-            background: #f5f5f5;
-            color: #1a1a1a;
+            border: 1.5px solid var(--border-color);
+            background: var(--surface-secondary);
+            color: var(--text-color);
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -502,34 +500,19 @@
             justify-content: center;
         }
 
-        body.dark .preset-btn {
-            border-color: #404040;
-            background: #1a1a1a;
-            color: #eaeaea;
-        }
-
         .preset-btn:hover {
-            background: #f0f0f0;
-            border-color: #b0b0b0;
+            filter: brightness(0.95);
         }
 
         body.dark .preset-btn:hover {
-            background: #1f1f1f;
-            border-color: #505050;
+            filter: brightness(1.1);
         }
 
         .preset-btn.active {
-            background: #000;
-            color: #fff;
-            border-color: #000;
+            background: var(--active-item-bg);
+            color: var(--active-item-text);
+            border-color: var(--active-item-bg);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        body.dark .preset-btn.active {
-            background: #fff;
-            color: #000;
-            border-color: #fff;
-            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
         }
 
         .preset-btn:active:not(.active) {
@@ -565,34 +548,24 @@
 
         /* Primary Button (Convert, Download) - Emphasis */
         .btn-primary {
-            background: #000;
-            color: #fff;
+            background: var(--primary-accent);
+            color: var(--button-text-primary);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
         }
 
         .btn-primary:hover:not(:disabled) {
-            background: #1a1a1a;
+            filter: brightness(1.1);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
             transform: translateY(-1px);
         }
 
-        body.dark .btn-primary {
-            background: #fff;
-            color: #000;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        body.dark .btn-primary:hover:not(:disabled) {
-            background: #f5f5f5;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        }
-
         /* Secondary Button (Cancel, Reset) - Subtle */
         .btn-secondary {
-            background: #f5f5f5;
-            color: #1a1a1a;
-            border: 1.5px solid #d0d0d0;
+            background: var(--surface-secondary);
+            color: var(--text-color);
+            border: 1.5px solid var(--border-color);
         }
+
 
         .btn-secondary:hover:not(:disabled) {
             background: #f0f0f0;
@@ -731,7 +704,7 @@
             background: #fff;
             border-radius: 16px;
             padding: 16px;
-            width: 300px;
+            width: 330px;
             height: 250px;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
@@ -875,22 +848,93 @@
             .result-card-content {
                 font-size: 12px;
             }
+        }
+
+        /* MOBILE OPTIMIZATION FOR MODAL */
+        @media (max-width: 768px) {
+            .modal-overlay {
+                padding: 16px;
+                backdrop-filter: blur(2px);
+            }
 
             .modal-card {
-                padding: 16px;
-                width: 240px;
-                height: 200px;
-                border-radius: 12px;
-                gap: 0;
-                justify-content: space-around;
+                width: 90vw;
+                max-width: 340px;
+                min-height: auto;
+                height: auto;
+                padding: 28px 24px;
+                border-radius: 16px;
+                gap: 18px;
+                justify-content: center;
+            }
+
+            .spinner {
+                width: 56px;
+                height: 56px;
+                border-width: 5px;
+                flex-shrink: 0;
+            }
+
+            .modal-text-content {
+                gap: 8px;
+                width: 100%;
+                padding: 0 4px;
+            }
+
+            .modal-title {
+                font-size: 17px;
+                line-height: 1.4;
+                word-wrap: break-word;
+                max-width: 100%;
+            }
+
+            .modal-subtitle {
+                font-size: 14px;
+                line-height: 1.5;
+                padding: 0;
+                word-wrap: break-word;
+                max-width: 100%;
+            }
+
+            .modal-button {
+                width: auto;
+                min-width: 120px;
+                min-height: 48px;
+                height: auto;
+                padding: 14px 32px;
+                font-size: 14px;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+                align-self: center;
             }
         }
 
-        .overlap-btn {
-            width: 48px;
-            height: 48px;
-            font-size: 18px;
-        }
+        /* EXTRA SMALL DEVICES */
+        @media (max-width: 400px) {
+            .modal-card {
+                width: 92vw;
+                padding: 20px 16px;
+            }
+
+            .spinner {
+                width: 48px;
+                height: 48px;
+                border-width: 4px;
+            }
+
+            .modal-title {
+                font-size: 16px;
+            }
+
+            .modal-subtitle {
+                font-size: 13px;
+            }
+
+            .modal-button {
+                min-height: 44px;
+                padding: 12px 18px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>
@@ -902,8 +946,8 @@
             <div class="header-left">
                 <div style="font-size: 24px;">📄</div>
                 <div class="app-title">
-                    <h1>PDF to A4</h1>
-                    <p class="app-subtitle">Split & Print</p>
+                    <h1>PDF Splitter</h1>
+                    <p class="app-subtitle">made fast, simple, and precise.</p>
                 </div>
             </div>
             <button class="theme-toggle" onclick="toggleDark()" title="Toggle dark mode">Dark</button>
@@ -931,6 +975,22 @@
             </div>
 
             <div class="form-group">
+                <label>Paper Format</label>
+                <div class="preset-buttons" id="formatButtons">
+                    <button type="button" class="preset-btn" data-format="A2"
+                        onclick="setFormat(this, 'A2')">A2</button>
+                    <button type="button" class="preset-btn" data-format="A3"
+                        onclick="setFormat(this, 'A3')">A3</button>
+                    <button type="button" class="preset-btn active" data-format="A4"
+                        onclick="setFormat(this, 'A4')">A4</button>
+                    <button type="button" class="preset-btn" data-format="A5"
+                        onclick="setFormat(this, 'A5')">A5</button>
+                    <button type="button" class="preset-btn" data-format="Letter"
+                        onclick="setFormat(this, 'Letter')">Letter</button>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label>Overlap (mm)</label>
                 <div class="overlap-control">
                     <div class="overlap-value" id="overlapValue">8</div>
@@ -938,6 +998,7 @@
                     <button type="button" id="overlapPlus" class="overlap-btn" onclick="increaseOverlap()">+</button>
                 </div>
             </div>
+
 
             <div class="form-group">
                 <div class="quality-group">
@@ -949,7 +1010,7 @@
                             <label>DPI</label>
                         </div>
                     </div>
-                    <div class="preset-buttons">
+                    <div class="preset-buttons" id="qualityButtons">
                         <button type="button" class="preset-btn" data-dpi="200"
                             onclick="setQualityPreset(200, this)">Fast</button>
                         <button type="button" class="preset-btn active" data-dpi="300"
@@ -1013,7 +1074,7 @@
         const overlapMinus = document.getElementById("overlapMinus");
         const overlapPlus = document.getElementById("overlapPlus");
         const dpiInput = document.getElementById("dpiInput");
-        const presetButtons = document.querySelectorAll(".preset-btn");
+        const qualityButtons = document.querySelectorAll("#qualityButtons .preset-btn");
 
         // ============== FILE UPLOAD ELEMENTS ==============
         const pdfInput = document.getElementById("pdf");
@@ -1086,9 +1147,23 @@
                 cardDetails.style.display = "none";
             }
             if (showError) {
-                errorDiv.style.display = "block";
+                errorDiv.innerText = status;
+                errorDiv.classList.add("show");
             } else {
                 errorDiv.classList.remove("show");
+            }
+        }
+
+        // ============== PAPER FORMAT ==============
+        let paperFormat = "A4";
+        function setFormat(btn, format) {
+            paperFormat = format;
+            document.querySelectorAll("#formatButtons .preset-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            // Re-estimate if we have a file
+            if (pdfInput.files.length > 0) {
+                triggerEstimate(pdfInput.files[0]);
             }
         }
 
@@ -1098,54 +1173,49 @@
                 overlapVal--;
                 overlapValue.innerText = overlapVal;
                 updateOverlapButtons();
+                if (pdfInput.files.length > 0) triggerEstimate(pdfInput.files[0]);
             }
         }
 
         function increaseOverlap() {
-            if (overlapVal < 30) {
+            if (overlapVal < 50) {
                 overlapVal++;
                 overlapValue.innerText = overlapVal;
                 updateOverlapButtons();
+                if (pdfInput.files.length > 0) triggerEstimate(pdfInput.files[0]);
             }
         }
 
         function updateOverlapButtons() {
             overlapMinus.disabled = overlapVal <= 0;
-            overlapPlus.disabled = overlapVal >= 30;
+            overlapPlus.disabled = overlapVal >= 50;
         }
 
         // ============== DPI QUALITY PRESET CONTROL ==============
         function setQualityPreset(dpi, buttonElement) {
             dpiVal = dpi;
             dpiInput.value = dpi;
-
-            // Update active button state
-            presetButtons.forEach(btn => btn.classList.remove("active"));
+            qualityButtons.forEach(btn => btn.classList.remove("active"));
             buttonElement.classList.add("active");
+            if (pdfInput.files.length > 0) triggerEstimate(pdfInput.files[0]);
         }
 
-        function handleDpiCustom(value) {
-            let dpi = parseInt(value);
-
-            // Clamp to valid range
-            if (isNaN(dpi)) dpi = 300;
-            if (dpi < 150) dpi = 150;
-            if (dpi > 600) dpi = 600;
-
-            dpiVal = dpi;
-            dpiInput.value = dpi;
-
-            // Check if custom value matches a preset
-            const presets = { 200: 0, 300: 1, 450: 2 };
-            if (presets.hasOwnProperty(dpi)) {
-                // Highlight the matching preset
-                presetButtons.forEach(btn => btn.classList.remove("active"));
-                presetButtons[presets[dpi]].classList.add("active");
-            } else {
-                // Custom value - deselect all presets
-                presetButtons.forEach(btn => btn.classList.remove("active"));
+        dpiInput.addEventListener("input", (e) => {
+            let val = parseInt(e.target.value);
+            if (!isNaN(val)) {
+                dpiVal = val;
+                // Update presets if matches
+                qualityButtons.forEach(btn => btn.classList.remove("active"));
+                if (val === 200) qualityButtons[0].classList.add("active");
+                if (val === 300) qualityButtons[1].classList.add("active");
+                if (val === 450) qualityButtons[2].classList.add("active");
             }
-        }
+        });
+
+        dpiInput.addEventListener("change", () => {
+            if (pdfInput.files.length > 0) triggerEstimate(pdfInput.files[0]);
+        });
+
 
         // ============== MODAL CONTROL ==============
         function showModal() {
@@ -1156,74 +1226,55 @@
             processingModal.classList.remove("show");
         }
 
-        // ============== FILE INPUT CHANGE ==============
-        document.getElementById("pdf").addEventListener("change", async (e) => {
-            const pdf = e.target.files[0];
-            if (!pdf) return;
-
+        // ============== ESTIMATION LOGIC ==============
+        async function triggerEstimate(pdf) {
             if (isEstimating) return;
             isEstimating = true;
-
-            const overlap = overlapVal;
-            const dpi = dpiVal;
-
-            updateCard("Estimating…", "Calculating pages and size");
+            updateCard("Estimating...", "Calculating pages and size");
             errorDiv.classList.remove("show");
 
             const formData = new FormData();
             formData.append("pdf", pdf);
-            formData.append("overlap", overlap);
-            formData.append("dpi", dpi);
+            formData.append("overlap", overlapVal);
+            formData.append("dpi", dpiVal);
+            formData.append("paper_format", paperFormat);
 
             try {
-                const estRes = await fetch("/estimate", { method: "POST", body: formData });
+                const res = await fetch("/estimate", { method: "POST", body: formData });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
 
-                if (!estRes.ok) {
-                    const data = await estRes.json();
-                    throw new Error(data.error || "Estimation failed");
-                }
-
-                const est = await estRes.json();
-                estimateData = est;
-                updateCard("Ready to Convert", `Input: ${est.pages} pages | ${est.size}`);
-
+                estimateData = data;
+                updateCard("Ready to Convert", `Input: ${data.pages} pages | ${data.size}`, `${paperFormat} Output`);
+                submitBtn.disabled = false;
             } catch (err) {
                 updateCard("Estimation Failed", err.message, "", true);
+                estimateData = null;
+                submitBtn.disabled = true;
             } finally {
                 isEstimating = false;
+            }
+        }
+
+        // ============== FILE INPUT CHANGE ==============
+        pdfInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            updateFileUploadDisplay();
+            if (file) {
+                triggerEstimate(file);
+            } else {
+                reset();
             }
         });
 
         // ============== FORM SUBMIT ==============
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
+            if (isSubmitting || isProcessing) return;
 
-            if (isSubmitting || isProcessing) {
-                console.warn("Conversion already in progress");
-                return;
-            }
-
-            const pdf = document.getElementById("pdf").files[0];
-            const overlap = overlapVal;
-            const dpi = dpiVal;
-
+            const pdf = pdfInput.files[0];
             if (!pdf) {
-                updateCard("Validation Error", "Please select a PDF file", "", true);
-                return;
-            }
-
-            if (!estimateData) {
-                updateCard("Validation Error", "Please wait for estimate to complete", "", true);
-                return;
-            }
-
-            if (overlap < 0 || overlap > 30) {
-                updateCard("Validation Error", "Overlap must be between 0-30 mm", "", true);
-                return;
-            }
-
-            if (dpi < 150 || dpi > 600) {
-                updateCard("Validation Error", "DPI must be between 150-600", "", true);
+                updateCard("Error", "Please select a PDF file", "", true);
                 return;
             }
 
@@ -1232,145 +1283,115 @@
             submitBtn.disabled = true;
             errorDiv.classList.remove("show");
 
-            // Show processing modal
             showModal();
-            updateCard("Processing…", "Starting conversion");
+            // Update modal text
+            const modalTitle = processingModal.querySelector(".modal-title");
+            const modalSubtitle = processingModal.querySelector(".modal-subtitle");
+            modalTitle.innerText = "Processing your request"; // Reset default
+            modalSubtitle.innerText = "Please wait while we process... Do not refresh.";
 
             const formData = new FormData();
             formData.append("pdf", pdf);
-            formData.append("overlap", overlap);
-            formData.append("dpi", dpi);
+            formData.append("overlap", overlapVal);
+            formData.append("dpi", dpiVal);
+            formData.append("paper_format", paperFormat);
 
             try {
-                const uploadRes = await fetch("/upload", { method: "POST", body: formData });
+                const res = await fetch("/upload", { method: "POST", body: formData });
+                const data = await res.json();
 
-                if (!uploadRes.ok) {
-                    const data = await uploadRes.json();
-                    throw new Error(data.error || "Upload failed");
-                }
+                if (data.error) throw new Error(data.error);
 
                 pollProgress();
-
             } catch (err) {
                 hideModal();
                 updateCard("Conversion Failed", err.message, "", true);
-                submitBtn.disabled = false;
                 isProcessing = false;
                 isSubmitting = false;
+                submitBtn.disabled = false;
             }
         });
 
-        // ============== PROGRESS POLLING ==============
+        // ============== POLLING ==============
         function pollProgress() {
             pollTimer = setInterval(async () => {
                 try {
                     const res = await fetch("/progress");
-                    if (!res.ok) throw new Error("Progress fetch failed");
-
                     const state = await res.json();
 
                     if (state.error) {
-                        errorDiv.innerText = state.error;
-                        errorDiv.classList.add("show");
-                    }
-
-                    // Handle completion
-                    if (state.percent >= 100) {
                         clearInterval(pollTimer);
                         hideModal();
-                        downloadBtn.disabled = false;
+                        updateCard("Error", state.error, "", true);
                         isProcessing = false;
                         isSubmitting = false;
-
-                        const outputSize = state.output_size || "Unknown";
-                        const outputPages = state.output_pages || estimateData.pages;
-                        updateCard(
-                            "Download Ready",
-                            "Conversion complete",
-                            `Output: ${outputPages} pages | ${outputSize}`
-                        );
+                        submitBtn.disabled = false;
+                        return;
                     }
 
-                    // Handle cancellation
                     if (state.status === "Cancelled") {
                         clearInterval(pollTimer);
                         hideModal();
-                        submitBtn.disabled = false;
+                        updateCard("Cancelled", "Conversion was cancelled");
                         isProcessing = false;
                         isSubmitting = false;
-                        updateCard("Conversion cancelled", "Ready to convert again", estimateData ? `Input: ${estimateData.pages} pages | ${estimateData.size}` : "");
+                        submitBtn.disabled = false;
+                        return;
                     }
 
-                } catch (err) {
-                    console.error("Poll error:", err);
+                    // Update modal status
+                    const modalSubtitle = processingModal.querySelector(".modal-subtitle");
+                    if (modalSubtitle) modalSubtitle.innerText = state.status;
+
+                    if (state.percent >= 100) {
+                        clearInterval(pollTimer);
+                        hideModal();
+                        isProcessing = false;
+                        isSubmitting = false;
+                        downloadBtn.disabled = false;
+                        submitBtn.disabled = false; // Allow new conversion
+
+                        const outPages = state.output_pages || "?";
+                        const outSize = state.output_size || "?";
+                        updateCard("Conversion Complete", "Ready for download", `Output: ${outPages} pages | ${outSize}`);
+                    }
+
+                } catch (e) {
+                    console.error(e);
                 }
-            }, 500);
+            }, 1000);
         }
 
-        // ============== CANCEL ==============
         function cancelJob() {
-            fetch("/cancel", { method: "POST" })
-                .then(() => {
-                    if (pollTimer) clearInterval(pollTimer);
-                    hideModal();
-                    submitBtn.disabled = false;
-                    isProcessing = false;
-                    isSubmitting = false;
-                    downloadBtn.disabled = true;
-                    errorDiv.style.display = "none";
-                    updateCard(
-                        "Conversion cancelled",
-                        "Ready to convert again",
-                        estimateData ? `Input: ${estimateData.pages} pages | ${estimateData.size}` : ""
-                    );
-                })
-                .catch(err => {
-                    console.error("Cancel error:", err);
-                    hideModal();
-                });
+            fetch("/cancel", { method: "POST" });
         }
 
-        // ============== DOWNLOAD ==============
         function download() {
-            window.location = "/download";
+            window.location.href = "/download";
         }
 
-        // ============== RESET ==============
         function reset() {
-            // Clear file input and update display
             pdfInput.value = "";
             updateFileUploadDisplay();
 
-            // Reset form (but file input is already cleared)
-            form.reset();
-
-            // Clear error message
-            errorDiv.classList.remove("show");
-
-            // Reset buttons
-            downloadBtn.disabled = true;
-            submitBtn.disabled = false;
-
-            // Reset state
-            estimateData = null;
-            isProcessing = false;
-            isSubmitting = false;
-
-            // Reset overlap control
             overlapVal = 8;
-            overlapValue.innerText = overlapVal;
+            overlapValue.innerText = "8";
             updateOverlapButtons();
 
-            // Reset DPI control
             dpiVal = 300;
             dpiInput.value = 300;
+            qualityButtons.forEach(b => b.classList.remove("active"));
+            qualityButtons[1].classList.add("active");
 
-            // Reset to Balanced preset
-            presetButtons.forEach(btn => btn.classList.remove("active"));
-            presetButtons[1].classList.add("active");
+            paperFormat = "A4";
+            document.querySelectorAll("#formatButtons .preset-btn").forEach(b => b.classList.remove("active"));
+            document.querySelector("#formatButtons .preset-btn[data-format='A4']").classList.add("active");
 
-            // Reset card display
+            errorDiv.classList.remove("show");
             updateCard("Ready to convert", "Upload a PDF to begin");
+            downloadBtn.disabled = true;
+            submitBtn.disabled = false;
+            estimateData = null;
         }
 
         // ============== DARK MODE ==============
@@ -1381,7 +1402,7 @@
             document.querySelector(".theme-toggle").innerText = isDark ? "Light" : "Dark";
         }
 
-        // ============== INITIALIZATION ==============
+        // Init dark mode
         if (localStorage.getItem("darkMode") === "true") {
             document.body.classList.add("dark");
             document.querySelector(".theme-toggle").innerText = "Light";
@@ -1393,11 +1414,10 @@
         updateOverlapButtons();
 
         // Initialize DPI preset - set Balanced (300) as default
-        presetButtons[1].classList.add("active");
+        qualityButtons[1].classList.add("active");
         dpiVal = 300;
         dpiInput.value = 300;
     </script>
-
 </body>
 
 </html>

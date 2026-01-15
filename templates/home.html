@@ -24,6 +24,8 @@
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            flex-direction: column;
         }
 
         body.dark {
@@ -48,7 +50,7 @@
         }
 
         .header-content {
-            max-width: 960px;
+            max-width: 100%;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -56,27 +58,29 @@
         }
 
         .app-title h1 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             letter-spacing: -0.3px;
         }
 
         .theme-toggle {
-            width: 40px;
-            height: 40px;
-            border: none;
-            border-radius: 8px;
-            background: #f0f0f0;
+            min-width: 80px;
+            height: 48px;
+            border: 1.5px solid #d0d0d0;
+            border-radius: 10px;
+            background: #f5f5f5;
             color: #1a1a1a;
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
-            padding: 4px 8px;
-            min-width: 60px;
+            padding: 12px 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-family: inherit;
         }
 
         body.dark .theme-toggle {
@@ -85,12 +89,11 @@
         }
 
         .theme-toggle:hover {
-            background: #e0e0e0;
-            transform: scale(1.05);
+            filter: brightness(0.95);
         }
 
         body.dark .theme-toggle:hover {
-            background: #2a2a2a;
+            filter: brightness(1.1);
         }
 
         /* MAIN CONTAINER */
@@ -123,7 +126,7 @@
         /* TOOLS GRID */
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, 280px);
             gap: 32px;
             margin-bottom: 80px;
         }
@@ -251,17 +254,23 @@
 
         /* FOOTER */
         .footer {
+            width: 100%;
+            padding: 24px;
+            background: #1400c6;
+            /* Power Blue */
+            color: #ffffff;
             text-align: center;
-            margin-top: 80px;
-            padding-top: 32px;
-            border-top: 1px solid #e5e5e5;
             font-size: 13px;
-            opacity: 0.6;
-            line-height: 1.6;
+            font-weight: 500;
+            margin-top: auto;
+            border-top: none;
         }
 
         body.dark .footer {
-            border-top-color: #2a2a2a;
+            background: #beef00;
+            /* Bright Green */
+            color: #000000;
+            border-top: none;
         }
 
         /* RESPONSIVE */
@@ -290,6 +299,8 @@
 
             .tool-card {
                 padding: 24px 20px;
+                aspect-ratio: auto;
+                min-height: auto;
             }
 
             .footer {
@@ -307,7 +318,7 @@
             <div class="app-title">
                 <h1>PDF Tools</h1>
             </div>
-            <button class="theme-toggle" onclick="toggleDark()">Dark</button>
+            <button class="theme-toggle" onclick="toggleDark()" title="Toggle dark mode">Dark</button>
         </div>
     </header>
 
@@ -323,56 +334,18 @@
         <div class="tools-grid">
             <a href="/pdf-to-a4" class="tool-card">
                 <div class="tool-icon">📄</div>
-                <div class="tool-title">PDF to A4</div>
-                <div class="tool-description">Split any PDF into standard A4 pages with custom overlap for easy printing
-                    and reading.</div>
+                <div class="tool-title">PDF Splitter</div>
+                <div class="tool-description">Convert long format PDFs into perfectly sized pages. Choose your format,
+                    adjust overlap, and quality.</div>
                 <div class="tool-arrow">→</div>
             </a>
-
-            <div class="tool-card coming-soon">
-                <div class="coming-soon-badge">Coming Soon</div>
-                <div class="tool-icon">📑</div>
-                <div class="tool-title">PDF Merger</div>
-                <div class="tool-description">Combine multiple PDF files into a single document with ease.</div>
-            </div>
-
-            <div class="tool-card coming-soon">
-                <div class="coming-soon-badge">Coming Soon</div>
-                <div class="tool-icon">✂️</div>
-                <div class="tool-title">PDF Splitter</div>
-                <div class="tool-description">Extract specific pages or ranges from PDF documents.</div>
-            </div>
-
-            <div class="tool-card coming-soon">
-                <div class="coming-soon-badge">Coming Soon</div>
-                <div class="tool-icon">🖼️</div>
-                <div class="tool-title">PDF to Image</div>
-                <div class="tool-description">Convert PDF pages to high-quality images in multiple formats.</div>
-            </div>
-
-            <div class="tool-card coming-soon">
-                <div class="coming-soon-badge">Coming Soon</div>
-                <div class="tool-icon">📝</div>
-                <div class="tool-title">Compress PDF</div>
-                <div class="tool-description">Reduce PDF file size while maintaining quality and clarity.</div>
-            </div>
-
-            <div class="tool-card coming-soon">
-                <div class="coming-soon-badge">Coming Soon</div>
-                <div class="tool-icon">🔐</div>
-                <div class="tool-title">PDF Protector</div>
-                <div class="tool-description">Add passwords and encryption to protect your PDF documents.</div>
-            </div>
-        </div>
-
-        <!-- FOOTER -->
-        <div class="footer">
-            Built with ❤️ by Kamalesh
-            <br>
-            Files are processed temporarily and automatically deleted.<br>
-            Do not upload sensitive documents.
         </div>
     </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        Files are processed temporarily and automatically deleted for your privacy.
+    </footer>
 
     <script>
         // ============== DARK MODE ==============
