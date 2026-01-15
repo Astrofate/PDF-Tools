@@ -74,7 +74,7 @@ def home():
 
 @app.route("/pdf-to-a4")
 def pdf_to_a4():
-    return render_template("index.html")
+    return render_template("PDF-Splitter.html")
 
 
 @app.route("/progress")
