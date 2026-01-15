@@ -117,10 +117,23 @@
 
         .hero p {
             font-size: 18px;
-            opacity: 0.7;
+            color: rgba(26, 26, 26, 0.7);
             max-width: 600px;
             margin: 0 auto;
             line-height: 1.6;
+        }
+
+        body.dark .hero p {
+            color: rgba(234, 234, 234, 0.7);
+        }
+
+        .hero-highlight {
+            color: #1400c6;
+            font-weight: 700;
+        }
+
+        body.dark .hero-highlight {
+            color: #beef00;
         }
 
         /* TOOLS GRID */
@@ -326,8 +339,9 @@
     <div class="container">
         <!-- HERO -->
         <div class="hero">
-            <h1>PDF Conversion Tools</h1>
-            <p>A collection of simple, fast, and privacy-focused tools to help you work with PDF files.</p>
+            <h1>One workspace. Full PDF control.</h1>
+            <p>Handle your PDFs with powerful tools built for speed and reliability. Convert, split, optimize, and
+                organize your files in seconds - <span class="hero-highlight">no cost, no limits.</span></p>
         </div>
 
         <!-- TOOLS GRID -->
