@@ -72,7 +72,7 @@ def home():
     return render_template("home.html")
 
 
-@app.route("/pdf-to-a4")
+@app.route("/PDF-Splitter")
 def pdf_to_a4():
     return render_template("PDF-Splitter.html")
 

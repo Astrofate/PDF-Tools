@@ -139,7 +139,7 @@ function updateDpiLabel()     // Read slider, update dpiVal and display
 
 ## Recommended Next Steps
 
-1. **Full Page Test**: Load `/pdf-to-a4` and verify UI renders correctly
+1. **Full Page Test**: Load `/PDF-Splitter` and verify UI renders correctly
 2. **Modal Animation Test**: Click Convert and verify modal appears with smooth animations
 3. **Overlap Counter Test**: Test increment/decrement buttons, verify boundaries (0-30)
 4. **DPI Slider Test**: Drag slider and verify label updates in real-time
