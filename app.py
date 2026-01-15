@@ -69,6 +69,11 @@ def should_cancel():
 # ============== ROUTES ==============
 @app.route("/")
 def home():
+    return render_template("home.html")
+
+
+@app.route("/pdf-to-a4")
+def pdf_to_a4():
     return render_template("index.html")
 
 

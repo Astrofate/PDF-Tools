@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF to A4 Splitter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,11 +17,13 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
             background: #fafafa;
             color: #1a1a1a;
             transition: background-color 0.3s ease, color 0.3s ease;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body.dark {
@@ -71,36 +78,68 @@
             opacity: 0.6;
         }
 
-        .theme-toggle {
-            width: 40px;
-            height: 40px;
+        /* ============== UNIFIED BUTTON SYSTEM ============== */
+        /* Base button styling - shared across all interactive elements */
+        .btn {
             border: none;
-            border-radius: 8px;
-            background: #f0f0f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            padding: 12px 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 48px;
+            letter-spacing: 0.2px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        /* THEME TOGGLE */
+        .theme-toggle {
+            min-width: 80px;
+            height: 48px;
+            border: 1.5px solid #d0d0d0;
+            border-radius: 10px;
+            background: #f5f5f5;
             color: #1a1a1a;
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
-            padding: 4px 8px;
-            min-width: 60px;
+            padding: 12px 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         body.dark .theme-toggle {
             background: #1a1a1a;
             color: #eaeaea;
+            border-color: #404040;
         }
 
         .theme-toggle:hover {
-            background: #e0e0e0;
-            transform: scale(1.05);
+            background: #f0f0f0;
+            border-color: #b0b0b0;
         }
 
         body.dark .theme-toggle:hover {
-            background: #2a2a2a;
+            background: #1f1f1f;
+            border-color: #505050;
         }
 
         /* MAIN CONTAINER */
@@ -138,53 +177,371 @@
             opacity: 0.65;
         }
 
-        input[type="file"],
-        input[type="number"] {
-            padding: 14px 16px;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            background: #f5f5f5;
-            color: #1a1a1a;
-            transition: all 0.2s ease;
-            font-family: inherit;
+        /* HIDDEN FILE INPUT - Native control hidden */
+        input[type="file"] {
+            display: none !important;
         }
 
-        body.dark input[type="file"],
-        body.dark input[type="number"] {
+        /* CUSTOM FILE UPLOAD AREA */
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .file-upload-area {
+            padding: 12px 16px;
+            border: 1.5px solid #d0d0d0;
+            border-radius: 10px;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            user-select: none;
+        }
+
+        body.dark .file-upload-area {
+            background: #1a1a1a;
+            color: #eaeaea;
+            border-color: #404040;
+        }
+
+        .file-upload-area:hover {
+            background: #f0f0f0;
+            border-color: #b0b0b0;
+        }
+
+        body.dark .file-upload-area:hover {
+            background: #1f1f1f;
+            border-color: #505050;
+        }
+
+        .file-upload-area:focus-within {
+            outline: none;
+            background: #fff;
+            border-color: #000;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark .file-upload-area:focus-within {
+            background: #222;
+            border-color: #fff;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        .file-upload-text {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+        }
+
+        .file-upload-icon {
+            flex-shrink: 0;
+            font-size: 16px;
+            opacity: 0.6;
+        }
+
+        .file-upload-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .file-upload-placeholder {
+            opacity: 0.6;
+            font-size: 14px;
+        }
+
+        .file-upload-clear {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            padding: 0;
+            font-size: 16px;
+            color: inherit;
+        }
+
+        .file-upload-area:hover .file-upload-clear {
+            opacity: 0.6;
+        }
+
+        .file-upload-area:hover .file-upload-clear:hover {
+            opacity: 1;
+        }
+
+        .file-upload-area.has-file .file-upload-placeholder {
+            display: none;
+        }
+
+        .file-upload-area.has-file .file-upload-name {
+            display: block;
+        }
+
+        .file-upload-area:not(.has-file) .file-upload-name {
+            display: none;
+        }
+
+        .file-upload-area:not(.has-file) .file-upload-clear {
+            display: none;
+        }
+
+        /* OVERLAP COUNTER CONTROL */
+        .overlap-control {
+            display: flex;
+            gap: 0;
+            align-items: center;
+            justify-content: flex-start;
+            border: 1px solid #d0d0d0;
+            border-radius: 12px;
+            padding: 0;
+            background: transparent;
+            width: 100%;
+            max-width: 180px;
+        }
+
+        body.dark .overlap-control {
+            border-color: #404040;
+        }
+
+        .overlap-value {
+            flex: 1;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-right: 1.5px solid #d0d0d0;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.2px;
+        }
+
+        body.dark .overlap-value {
+            background: #1a1a1a;
+            border-right-color: #404040;
+        }
+
+        .overlap-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 0;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 48px;
+            border-right: 1.5px solid #d0d0d0;
+        }
+
+        body.dark .overlap-btn {
+            background: #1a1a1a;
+            color: #eaeaea;
+            border-right-color: #404040;
+        }
+
+        .overlap-btn:last-child {
+            border-right: none;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .overlap-btn:hover:not(:disabled) {
+            background: #f0f0f0;
+            border-right-color: #b0b0b0;
+        }
+
+        body.dark .overlap-btn:hover:not(:disabled) {
+            background: #1f1f1f;
+            border-right-color: #505050;
+        }
+
+        .overlap-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* DPI QUALITY PRESETS */
+        .quality-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quality-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .quality-label {
+            font-weight: 500;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            opacity: 0.65;
+        }
+
+        .dpi-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dpi-input-wrapper input {
+            width: auto;
+            min-width: 50px;
+            max-width: 80px;
+            padding: 4px 8px;
+            font-weight: 600;
+            font-size: 14px;
+            background: #f0f0f0;
+            border: 1px solid #d0d0d0;
+            border-radius: 6px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        /* Remove spinner arrows for Chrome, Edge, Safari */
+        .dpi-input-wrapper input::-webkit-outer-spin-button,
+        .dpi-input-wrapper input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Remove spinner arrows for Firefox */
+        .dpi-input-wrapper input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        body.dark .dpi-input-wrapper input {
+            background: #1a1a1a;
+            border-color: #404040;
+            color: #eaeaea;
+        }
+
+        .dpi-input-wrapper input:hover {
+            background: #f5f5f5;
+            border-color: #c0c0c0;
+        }
+
+        body.dark .dpi-input-wrapper input:hover {
+            background: #1f1f1f;
+            border-color: #505050;
+        }
+
+        .dpi-input-wrapper input:focus {
+            outline: none;
+            background: #fff;
+            border-color: #000;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark .dpi-input-wrapper input:focus {
+            background: #222;
+            border-color: #fff;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        .dpi-input-wrapper label {
+            font-size: 12px;
+            font-weight: 500;
+            opacity: 0.7;
+            white-space: nowrap;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .preset-btn {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border: 1.5px solid #d0d0d0;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.dark .preset-btn {
+            border-color: #404040;
             background: #1a1a1a;
             color: #eaeaea;
         }
 
-        input[type="file"]:hover,
-        input[type="number"]:hover {
+        .preset-btn:hover {
             background: #f0f0f0;
+            border-color: #b0b0b0;
         }
 
-        body.dark input[type="file"]:hover,
-        body.dark input[type="number"]:hover {
-            background: #222;
-        }
-
-        input[type="file"]:focus,
-        input[type="number"]:focus {
-            outline: none;
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
-        }
-
-        body.dark input[type="file"]:focus,
-        body.dark input[type="number"]:focus {
+        body.dark .preset-btn:hover {
             background: #1f1f1f;
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            border-color: #505050;
         }
 
-        /* BUTTONS */
+        .preset-btn.active {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark .preset-btn.active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
+        }
+
+        .preset-btn:active:not(.active) {
+            transform: scale(0.98);
+        }
+
+        /* BUTTONS - Base styling inherited from .btn class */
         button {
             border: none;
             border-radius: 10px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: inherit;
@@ -193,6 +550,8 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
+            height: 48px;
+            letter-spacing: 0.2px;
         }
 
         button:disabled {
@@ -204,7 +563,7 @@
             transform: scale(0.98);
         }
 
-        /* Primary Button (Convert) */
+        /* Primary Button (Convert, Download) - Emphasis */
         .btn-primary {
             background: #000;
             color: #fff;
@@ -228,27 +587,30 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
-        /* Secondary Button (Cancel, Reset) */
+        /* Secondary Button (Cancel, Reset) - Subtle */
         .btn-secondary {
-            background: #f0f0f0;
+            background: #f5f5f5;
             color: #1a1a1a;
-            border: 1px solid transparent;
+            border: 1.5px solid #d0d0d0;
         }
 
         .btn-secondary:hover:not(:disabled) {
-            background: #e5e5e5;
+            background: #f0f0f0;
+            border-color: #b0b0b0;
         }
 
         body.dark .btn-secondary {
             background: #1a1a1a;
             color: #eaeaea;
+            border-color: #404040;
         }
 
         body.dark .btn-secondary:hover:not(:disabled) {
-            background: #252525;
+            background: #1f1f1f;
+            border-color: #505050;
         }
 
-        /* Success Button (Download) */
+        /* Success Button (Download) - Primary variant */
         .btn-success {
             background: #000;
             color: #fff;
@@ -270,6 +632,7 @@
 
         body.dark .btn-success:hover:not(:disabled) {
             background: #f5f5f5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
         .form-buttons {
@@ -279,83 +642,6 @@
 
         .form-buttons button {
             flex: 1;
-        }
-
-        /* PROGRESS SECTION */
-        #progressSection {
-            display: block;
-        }
-
-        .progress-container {
-            margin-bottom: 24px;
-        }
-
-        progress {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            border: none;
-            background: #e5e5e5;
-            overflow: hidden;
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        body.dark progress {
-            background: #2a2a2a;
-        }
-
-        progress::-webkit-progress-bar {
-            background: #e5e5e5;
-            border-radius: 3px;
-        }
-
-        body.dark progress::-webkit-progress-bar {
-            background: #2a2a2a;
-        }
-
-        progress::-webkit-progress-value {
-            background: #000;
-            border-radius: 3px;
-            transition: width 0.4s ease;
-        }
-
-        body.dark progress::-webkit-progress-value {
-            background: #fff;
-        }
-
-        progress::-moz-progress-bar {
-            background: #000;
-            border-radius: 3px;
-            transition: width 0.4s ease;
-        }
-
-        body.dark progress::-moz-progress-bar {
-            background: #fff;
-        }
-
-        .divider {
-            height: 1px;
-            background: #d0d0d0;
-            margin: 20px 0;
-        }
-
-        body.dark .divider {
-            background: #404040;
-        }
-
-        .error-message {
-            color: #d32f2f;
-            font-size: 13px;
-            margin-top: 12px;
-            padding: 0;
-            background: transparent;
-            display: none;
-            line-height: 1.5;
-        }
-
-        .error-message.show {
-            display: block;
         }
 
         /* RESULT CARD */
@@ -376,7 +662,7 @@
         .result-card-title {
             font-weight: 600;
             font-size: 15px;
-            margin-bottom: 12px;
+            margin-bottom: 2px;
         }
 
         .result-card-content {
@@ -396,6 +682,159 @@
 
         .button-row .btn-secondary {
             flex: 0 0 auto;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 13px;
+            margin-top: 12px;
+            padding: 0;
+            background: transparent;
+            display: none;
+            line-height: 1.5;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* PROCESSING MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px;
+            width: 300px;
+            height: 250px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            gap: 0;
+        }
+
+        body.dark .modal-card {
+            background: #1a1a1a;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e5e5e5;
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0;
+        }
+
+        body.dark .spinner {
+            border-color: #2a2a2a;
+            border-top-color: #fff;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .modal-text-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .modal-subtitle {
+            font-size: 13px;
+            opacity: 0.7;
+            line-height: 1.4;
+            margin: 0;
+            padding: 0 8px;
+        }
+
+        .modal-button {
+            background: #f5f5f5;
+            color: #1a1a1a;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 1.5px solid #d0d0d0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            width: auto;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.2px;
+        }
+
+        body.dark .modal-button {
+            background: #1a1a1a;
+            color: #eaeaea;
+            border-color: #404040;
+        }
+
+        .modal-button:hover {
+            background: #f0f0f0;
+            border-color: #b0b0b0;
+        }
+
+        body.dark .modal-button:hover {
+            background: #1f1f1f;
+            border-color: #505050;
         }
 
         /* RESPONSIVE */
@@ -436,6 +875,22 @@
             .result-card-content {
                 font-size: 12px;
             }
+
+            .modal-card {
+                padding: 16px;
+                width: 240px;
+                height: 200px;
+                border-radius: 12px;
+                gap: 0;
+                justify-content: space-around;
+            }
+        }
+
+        .overlap-btn {
+            width: 48px;
+            height: 48px;
+            font-size: 18px;
+        }
         }
     </style>
 </head>
@@ -461,72 +916,164 @@
         <form id="form">
             <div class="form-group">
                 <label for="pdf">PDF File</label>
-                <input type="file" id="pdf" accept=".pdf" required>
+                <div class="file-upload-wrapper">
+                    <input type="file" id="pdf" accept=".pdf" required>
+                    <div class="file-upload-area" id="fileUploadArea" tabindex="0">
+                        <div class="file-upload-text">
+                            <span class="file-upload-icon">📁</span>
+                            <span class="file-upload-placeholder">Choose PDF file</span>
+                            <span class="file-upload-name" id="fileName"></span>
+                        </div>
+                        <button type="button" class="file-upload-clear" id="fileClearBtn"
+                            aria-label="Clear file selection">×</button>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="overlap">Overlap (mm)</label>
-                <input type="number" id="overlap" value="8" min="0" max="50">
+                <label>Overlap (mm)</label>
+                <div class="overlap-control">
+                    <div class="overlap-value" id="overlapValue">8</div>
+                    <button type="button" id="overlapMinus" class="overlap-btn" onclick="decreaseOverlap()">−</button>
+                    <button type="button" id="overlapPlus" class="overlap-btn" onclick="increaseOverlap()">+</button>
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="dpi">DPI (72-600)</label>
-                <input type="number" id="dpi" value="300" min="72" max="600">
+                <div class="quality-group">
+                    <div class="quality-label-row">
+                        <label class="quality-label">Quality</label>
+                        <div class="dpi-input-wrapper">
+                            <input type="number" id="dpiInput" min="150" max="600" value="300"
+                                onchange="handleDpiCustom(this.value)">
+                            <label>DPI</label>
+                        </div>
+                    </div>
+                    <div class="preset-buttons">
+                        <button type="button" class="preset-btn" data-dpi="200"
+                            onclick="setQualityPreset(200, this)">Fast</button>
+                        <button type="button" class="preset-btn active" data-dpi="300"
+                            onclick="setQualityPreset(300, this)">Balanced</button>
+                        <button type="button" class="preset-btn" data-dpi="450"
+                            onclick="setQualityPreset(450, this)">Best</button>
+                    </div>
+                </div>
             </div>
 
             <div class="form-buttons">
                 <button type="submit" id="submitBtn" class="btn-primary">Convert</button>
-                <button type="button" id="cancelBtn" onclick="cancelJob()" disabled class="btn-secondary">Cancel</button>
             </div>
         </form>
 
-        <!-- PROGRESS SECTION - ALWAYS VISIBLE -->
-        <div id="progressSection">
-            <div class="progress-container">
-                <progress id="bar" value="0" max="100"></progress>
+        <!-- RESULT CARD -->
+        <div class="result-card">
+            <div class="result-card-title" id="cardTitle">Ready to convert</div>
+            <div class="result-card-content">
+                <p id="cardStatus">Upload a PDF to begin</p>
+                <p id="cardDetails" style="margin-top: 8px; display: none;"></p>
+                <div id="error" class="error-message" style="margin-top: 8px;"></div>
             </div>
+        </div>
 
-            <!-- RESULT CARD - ALWAYS VISIBLE, CONTENT UPDATES DYNAMICALLY -->
-            <div class="result-card">
-                <div class="result-card-title" id="cardTitle">Ready to convert</div>
-                <div class="result-card-content">
-                    <p id="cardStatus">Upload a PDF to begin</p>
-                    <p id="cardDetails" style="margin-top: 8px; display: none;"></p>
-                    <div id="error" class="error-message" style="margin-top: 8px;"></div>
-                </div>
-            </div>
+        <div class="button-row">
+            <button onclick="download()" id="downloadBtn" disabled class="btn-success">Download</button>
+            <button type="button" onclick="reset()" id="resetBtn" class="btn-secondary">Reset</button>
+        </div>
 
-            <div class="button-row">
-                <button onclick="download()" id="downloadBtn" disabled class="btn-success">Download</button>
-                <button type="button" onclick="reset()" id="resetBtn" class="btn-secondary">Reset</button>
-            </div>
+        <div style="text-align: center; margin-top: 24px; font-size: 12px; opacity: 0.6; line-height: 1.6;">
+            Built with ❤️ by Kamalesh Seethamanavalan
+            <br>
+            Files are processed temporarily and automatically deleted.<br>
+            Do not upload sensitive documents.
+        </div>
+    </div>
 
-            <div style="text-align: center; margin-top: 24px; font-size: 12px; opacity: 0.6; line-height: 1.6;">
-                Built with ❤️ by Kamalesh Seethamanavalan
-                <br>
-                Files are processed temporarily and automatically deleted.<br>
-                Do not upload sensitive documents.
+    <!-- PROCESSING MODAL -->
+    <div id="processingModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="spinner"></div>
+            <div class="modal-text-content">
+                <div class="modal-title">Processing your request</div>
+                <div class="modal-subtitle">Please wait while we process your request. Do not refresh the page.</div>
             </div>
+            <button type="button" id="modalCancelBtn" class="modal-button" onclick="cancelJob()">Cancel</button>
         </div>
     </div>
 
     <script>
         const form = document.getElementById("form");
-        const bar = document.getElementById("bar");
         const cardTitle = document.getElementById("cardTitle");
         const cardStatus = document.getElementById("cardStatus");
         const cardDetails = document.getElementById("cardDetails");
         const downloadBtn = document.getElementById("downloadBtn");
-        const cancelBtn = document.getElementById("cancelBtn");
         const submitBtn = document.getElementById("submitBtn");
-        const progressSection = document.getElementById("progressSection");
         const errorDiv = document.getElementById("error");
+        const processingModal = document.getElementById("processingModal");
+        const overlapValue = document.getElementById("overlapValue");
+        const overlapMinus = document.getElementById("overlapMinus");
+        const overlapPlus = document.getElementById("overlapPlus");
+        const dpiInput = document.getElementById("dpiInput");
+        const presetButtons = document.querySelectorAll(".preset-btn");
+
+        // ============== FILE UPLOAD ELEMENTS ==============
+        const pdfInput = document.getElementById("pdf");
+        const fileUploadArea = document.getElementById("fileUploadArea");
+        const fileNameDisplay = document.getElementById("fileName");
+        const fileClearBtn = document.getElementById("fileClearBtn");
 
         let pollTimer = null;
         let estimateData = null;
         let isEstimating = false;
         let isProcessing = false;
         let isSubmitting = false;  // Prevent duplicate form submissions
+        let overlapVal = 8;
+        let dpiVal = 300;
+
+        // ============== CUSTOM FILE UPLOAD HANDLING ==============
+        function updateFileUploadDisplay() {
+            const hasFile = pdfInput.files.length > 0;
+            const fileName = hasFile ? pdfInput.files[0].name : "";
+
+            if (hasFile) {
+                fileUploadArea.classList.add("has-file");
+                fileNameDisplay.textContent = fileName;
+            } else {
+                fileUploadArea.classList.remove("has-file");
+                fileNameDisplay.textContent = "";
+            }
+        }
+
+        // Click on the custom upload area triggers the hidden file input
+        fileUploadArea.addEventListener("click", (e) => {
+            // Don't trigger if clicking the clear button
+            if (e.target !== fileClearBtn) {
+                pdfInput.click();
+            }
+        });
+
+        // Allow keyboard interaction (Enter/Space to open file picker)
+        fileUploadArea.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                pdfInput.click();
+            }
+        });
+
+        // Clear button removes the selected file
+        fileClearBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            pdfInput.value = "";
+            updateFileUploadDisplay();
+            updateCard("Ready to convert", "Upload a PDF to begin");
+            errorDiv.classList.remove("show");
+            fileUploadArea.focus();
+        });
+
+        // Update display when file changes (including programmatic clears)
+        pdfInput.addEventListener("change", () => {
+            updateFileUploadDisplay();
+        });
 
         // ============== UPDATE CARD DISPLAY ==============
         function updateCard(title, status, details = "", showError = false) {
@@ -545,21 +1092,82 @@
             }
         }
 
+        // ============== OVERLAP COUNTER CONTROL ==============
+        function decreaseOverlap() {
+            if (overlapVal > 0) {
+                overlapVal--;
+                overlapValue.innerText = overlapVal;
+                updateOverlapButtons();
+            }
+        }
+
+        function increaseOverlap() {
+            if (overlapVal < 30) {
+                overlapVal++;
+                overlapValue.innerText = overlapVal;
+                updateOverlapButtons();
+            }
+        }
+
+        function updateOverlapButtons() {
+            overlapMinus.disabled = overlapVal <= 0;
+            overlapPlus.disabled = overlapVal >= 30;
+        }
+
+        // ============== DPI QUALITY PRESET CONTROL ==============
+        function setQualityPreset(dpi, buttonElement) {
+            dpiVal = dpi;
+            dpiInput.value = dpi;
+
+            // Update active button state
+            presetButtons.forEach(btn => btn.classList.remove("active"));
+            buttonElement.classList.add("active");
+        }
+
+        function handleDpiCustom(value) {
+            let dpi = parseInt(value);
+
+            // Clamp to valid range
+            if (isNaN(dpi)) dpi = 300;
+            if (dpi < 150) dpi = 150;
+            if (dpi > 600) dpi = 600;
+
+            dpiVal = dpi;
+            dpiInput.value = dpi;
+
+            // Check if custom value matches a preset
+            const presets = { 200: 0, 300: 1, 450: 2 };
+            if (presets.hasOwnProperty(dpi)) {
+                // Highlight the matching preset
+                presetButtons.forEach(btn => btn.classList.remove("active"));
+                presetButtons[presets[dpi]].classList.add("active");
+            } else {
+                // Custom value - deselect all presets
+                presetButtons.forEach(btn => btn.classList.remove("active"));
+            }
+        }
+
+        // ============== MODAL CONTROL ==============
+        function showModal() {
+            processingModal.classList.add("show");
+        }
+
+        function hideModal() {
+            processingModal.classList.remove("show");
+        }
+
         // ============== FILE INPUT CHANGE ==============
         document.getElementById("pdf").addEventListener("change", async (e) => {
             const pdf = e.target.files[0];
             if (!pdf) return;
 
-            // Prevent multiple concurrent estimates
             if (isEstimating) return;
             isEstimating = true;
 
-            const overlap = document.getElementById("overlap").value;
-            const dpi = document.getElementById("dpi").value;
+            const overlap = overlapVal;
+            const dpi = dpiVal;
 
-            // Show estimating status
-            updateCard("Estimating…", "Calculating pages and size...");
-            bar.value = 0;
+            updateCard("Estimating…", "Calculating pages and size");
             errorDiv.classList.remove("show");
 
             const formData = new FormData();
@@ -568,7 +1176,6 @@
             formData.append("dpi", dpi);
 
             try {
-                // Calculate estimate only (don't start conversion)
                 const estRes = await fetch("/estimate", { method: "POST", body: formData });
 
                 if (!estRes.ok) {
@@ -591,17 +1198,15 @@
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            // Prevent duplicate submissions
             if (isSubmitting || isProcessing) {
-                console.warn("Conversion already in progress, ignoring duplicate request");
+                console.warn("Conversion already in progress");
                 return;
             }
 
             const pdf = document.getElementById("pdf").files[0];
-            const overlap = document.getElementById("overlap").value;
-            const dpi = document.getElementById("dpi").value;
+            const overlap = overlapVal;
+            const dpi = dpiVal;
 
-            // Validate
             if (!pdf) {
                 updateCard("Validation Error", "Please select a PDF file", "", true);
                 return;
@@ -612,25 +1217,23 @@
                 return;
             }
 
-            if (overlap < 0 || overlap > 50) {
-                updateCard("Validation Error", "Overlap must be between 0-50 mm", "", true);
+            if (overlap < 0 || overlap > 30) {
+                updateCard("Validation Error", "Overlap must be between 0-30 mm", "", true);
                 return;
             }
 
-            if (dpi < 72 || dpi > 600) {
-                updateCard("Validation Error", "DPI must be between 72-600", "", true);
+            if (dpi < 150 || dpi > 600) {
+                updateCard("Validation Error", "DPI must be between 150-600", "", true);
                 return;
             }
 
-            // Mark as submitting and processing
             isSubmitting = true;
             isProcessing = true;
-            
-            // Update UI for conversion start - disable Convert button
             submitBtn.disabled = true;
-            cancelBtn.disabled = false;
             errorDiv.classList.remove("show");
-            bar.value = 0;
+
+            // Show processing modal
+            showModal();
             updateCard("Processing…", "Starting conversion");
 
             const formData = new FormData();
@@ -639,7 +1242,6 @@
             formData.append("dpi", dpi);
 
             try {
-                // Upload and start conversion
                 const uploadRes = await fetch("/upload", { method: "POST", body: formData });
 
                 if (!uploadRes.ok) {
@@ -647,13 +1249,12 @@
                     throw new Error(data.error || "Upload failed");
                 }
 
-                // Start progress polling
                 pollProgress();
 
             } catch (err) {
+                hideModal();
                 updateCard("Conversion Failed", err.message, "", true);
-                // Keep Convert button disabled until Reset is clicked
-                cancelBtn.disabled = true;
+                submitBtn.disabled = false;
                 isProcessing = false;
                 isSubmitting = false;
             }
@@ -668,17 +1269,6 @@
 
                     const state = await res.json();
 
-                    // Update progress bar
-                    bar.value = state.percent;
-
-                    // Show live progress
-                    updateCard(
-                        "Processing…",
-                        `${state.percent}% complete`,
-                        `Input: ${estimateData.pages} pages | ${estimateData.size}`
-                    );
-
-                    // Show errors if any
                     if (state.error) {
                         errorDiv.innerText = state.error;
                         errorDiv.classList.add("show");
@@ -687,14 +1277,11 @@
                     // Handle completion
                     if (state.percent >= 100) {
                         clearInterval(pollTimer);
-                        bar.value = 100;
+                        hideModal();
                         downloadBtn.disabled = false;
-                        cancelBtn.disabled = true;
-                        // Keep Convert button disabled until Reset is clicked
                         isProcessing = false;
                         isSubmitting = false;
-                        
-                        // Show output file size and actual page count from backend
+
                         const outputSize = state.output_size || "Unknown";
                         const outputPages = state.output_pages || estimateData.pages;
                         updateCard(
@@ -707,12 +1294,11 @@
                     // Handle cancellation
                     if (state.status === "Cancelled") {
                         clearInterval(pollTimer);
-                        cancelBtn.disabled = true;
+                        hideModal();
                         submitBtn.disabled = false;
                         isProcessing = false;
                         isSubmitting = false;
-                        bar.value = 0;
-                        updateCard("Cancelled", "Conversion was cancelled");
+                        updateCard("Conversion cancelled", "Ready to convert again", estimateData ? `Input: ${estimateData.pages} pages | ${estimateData.size}` : "");
                     }
 
                 } catch (err) {
@@ -725,36 +1311,23 @@
         function cancelJob() {
             fetch("/cancel", { method: "POST" })
                 .then(() => {
-                    // Stop polling
                     if (pollTimer) clearInterval(pollTimer);
-                    
-                    // Disable Cancel button
-                    cancelBtn.disabled = true;
-                    
-                    // Re-enable Convert button (keep inputs intact)
+                    hideModal();
                     submitBtn.disabled = false;
-                    
-                    // Reset progress bar
-                    bar.value = 0;
-                    
-                    // Clear error display
-                    errorDiv.style.display = "none";
-                    
-                    // Reset flags
                     isProcessing = false;
                     isSubmitting = false;
-                    
-                    // Disable download button
                     downloadBtn.disabled = true;
-                    
-                    // Update status - show cancellation message
+                    errorDiv.style.display = "none";
                     updateCard(
                         "Conversion cancelled",
                         "Ready to convert again",
                         estimateData ? `Input: ${estimateData.pages} pages | ${estimateData.size}` : ""
                     );
                 })
-                .catch(err => console.error("Cancel error:", err));
+                .catch(err => {
+                    console.error("Cancel error:", err);
+                    hideModal();
+                });
         }
 
         // ============== DOWNLOAD ==============
@@ -764,22 +1337,40 @@
 
         // ============== RESET ==============
         function reset() {
+            // Clear file input and update display
+            pdfInput.value = "";
+            updateFileUploadDisplay();
+
+            // Reset form (but file input is already cleared)
             form.reset();
-            bar.value = 0;
+
+            // Clear error message
             errorDiv.classList.remove("show");
+
+            // Reset buttons
             downloadBtn.disabled = true;
-            submitBtn.disabled = false;  // Re-enable Convert button
-            cancelBtn.disabled = true;
+            submitBtn.disabled = false;
+
+            // Reset state
             estimateData = null;
             isProcessing = false;
             isSubmitting = false;
-            updateCard("Ready to convert", "Upload a PDF to begin");
-        }
 
-        // ============== ERROR HANDLING ==============
-        function showError(message) {
-            errorDiv.innerText = message;
-            errorDiv.classList.add("show");
+            // Reset overlap control
+            overlapVal = 8;
+            overlapValue.innerText = overlapVal;
+            updateOverlapButtons();
+
+            // Reset DPI control
+            dpiVal = 300;
+            dpiInput.value = 300;
+
+            // Reset to Balanced preset
+            presetButtons.forEach(btn => btn.classList.remove("active"));
+            presetButtons[1].classList.add("active");
+
+            // Reset card display
+            updateCard("Ready to convert", "Upload a PDF to begin");
         }
 
         // ============== DARK MODE ==============
@@ -787,19 +1378,26 @@
             document.body.classList.toggle("dark");
             const isDark = document.body.classList.contains("dark");
             localStorage.setItem("darkMode", isDark);
-            // Update button text
             document.querySelector(".theme-toggle").innerText = isDark ? "Light" : "Dark";
         }
 
         // ============== INITIALIZATION ==============
-        // Restore dark mode preference
         if (localStorage.getItem("darkMode") === "true") {
             document.body.classList.add("dark");
             document.querySelector(".theme-toggle").innerText = "Light";
         } else {
             document.querySelector(".theme-toggle").innerText = "Dark";
         }
+
+        // Initialize overlap buttons state
+        updateOverlapButtons();
+
+        // Initialize DPI preset - set Balanced (300) as default
+        presetButtons[1].classList.add("active");
+        dpiVal = 300;
+        dpiInput.value = 300;
     </script>
 
 </body>
+
 </html>

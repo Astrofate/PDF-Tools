@@ -1,0 +1,151 @@
+================================================================================
+                    DPI QUALITY CONTROL - VISUAL LAYOUT
+================================================================================
+
+FORM STRUCTURE:
+---------------
+
+┌─ FORM GROUP: PDF FILE ──────────────────────────────────────────────────────┐
+│                                                                              │
+│  PDF File                                                                    │
+│  [Select PDF File Input]                                                     │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌─ FORM GROUP: OVERLAP CONTROL ───────────────────────────────────────────────┐
+│                                                                              │
+│  Overlap (mm)                                                                │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ 8          │ −  │  +  │                                             │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌─ FORM GROUP: QUALITY (NEW) ─────────────────────────────────────────────────┐
+│                                                                              │
+│  Quality                          ┌──────────────┐                           │
+│                                   │ 300    │ DPI │                           │
+│                                   └──────────────┘                           │
+│                                                                              │
+│  ┌─────────────┬─────────────┬─────────────┐                                │
+│  │   Fast      │ Balanced    │    Best     │                                │
+│  │  (200 DPI)  │ (300 DPI)   │  (450 DPI)  │                                │
+│  │    [○]      │   [●]       │    [○]      │  ← Balanced is default         │
+│  └─────────────┴─────────────┴─────────────┘     active (filled)            │
+│                                                                              │
+│  User can:                                                                   │
+│  • Click a preset button to select that DPI                                 │
+│  • Edit the number input to enter custom DPI (150-600)                      │
+│  • When typing custom value:                                                │
+│    - If matches preset → highlight that preset                             │
+│    - If custom → deselect all presets                                       │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌─ FORM BUTTONS ──────────────────────────────────────────────────────────────┐
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                    Convert                                          │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+
+PRESET BUTTON STATES:
+─────────────────────
+
+INACTIVE STATE:
+┌─────────────────┐
+│   Fast          │  Light gray background
+│  (200 DPI)      │  Dark gray border
+└─────────────────┘  
+Hover: Slightly darker background
+
+ACTIVE STATE:
+┌─────────────────┐
+│ ▪ Balanced      │  Dark/Black background
+│  (300 DPI)      │  White text
+└─────────────────┘  Box shadow for depth
+Clicking another preset instantly switches active state
+
+
+CUSTOM DPI INPUT:
+─────────────────
+
+Normal state:         Light gray background
+                      Border: 1px solid gray
+                      Width: 60px
+                      Right-aligned text
+
+Hover state:          Slightly darker background
+                      Border slightly lighter
+
+Focus state:          White background (light mode)
+                      Dark border
+                      Box shadow (blue glow effect)
+                      Ready for typing
+
+Value: 300 (matches Balanced preset)
+Result: Balanced button highlighted
+
+Value: 350 (custom, no preset match)
+Result: No preset highlighted (custom mode)
+
+
+DPI VALUE MAPPING:
+──────────────────
+
+Fast      ─→  200 DPI   (Lightweight rendering, fastest processing)
+Balanced  ─→  300 DPI   (Default, recommended for most use cases)
+Best      ─→  450 DPI   (High quality, slower but better output)
+
+Custom    ─→  150-600   (User can enter any value in this range)
+
+
+INTERACTION FLOW:
+─────────────────
+
+Load Page
+    ↓
+Balanced preset selected (300 DPI active)
+    ↓
+User action?
+    ├─→ Click preset button
+    │   └─→ Highlight that preset, update DPI value
+    │
+    ├─→ Edit custom DPI input
+    │   ├─→ Value matches preset? Highlight preset
+    │   └─→ Custom value? Deselect all presets
+    │
+    └─→ Click Reset
+        └─→ Reset to Balanced (300 DPI)
+
+
+RESPONSIVE BEHAVIOR:
+────────────────────
+
+Desktop/Tablet:
+- Three preset buttons in one row
+- DPI input on same line as "Quality" label
+
+Mobile (if space tight):
+- Buttons may reflow but typically still 3-up
+- DPI input remains accessible
+- Touch-friendly sizes maintained
+
+
+DARK MODE:
+──────────
+
+Light Mode:
+- Gray backgrounds for inactive buttons
+- Dark text
+- Light borders
+
+Dark Mode (body.dark):
+- Dark backgrounds for inactive buttons
+- Light text  
+- Light borders
+- Active button inverts (light background, dark text)
+
+================================================================================
