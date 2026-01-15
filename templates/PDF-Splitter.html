@@ -936,6 +936,64 @@
                 font-size: 13px;
             }
         }
+
+        /* FLOATING BACK BUTTON */
+        .floating-back-btn {
+            position: fixed;
+            bottom: 32px;
+            left: 32px;
+            width: 54px;
+            height: 54px;
+            background: var(--surface-color);
+            color: var(--text-color);
+            border: 1.5px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        body.dark .floating-back-btn {
+            background: rgba(30, 30, 30, 0.8);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .floating-back-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary-accent);
+        }
+
+        body.dark .floating-back-btn:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .floating-back-btn:active {
+            transform: translateY(-2px) scale(0.95);
+        }
+
+        .floating-back-btn svg {
+            transition: transform 0.3s ease;
+        }
+
+        .floating-back-btn:hover svg {
+            transform: translateX(-2px);
+        }
+
+        @media (max-width: 640px) {
+            .floating-back-btn {
+                bottom: 24px;
+                left: 24px;
+                width: 48px;
+                height: 48px;
+            }
+        }
     </style>
 </head>
 
@@ -1418,6 +1476,14 @@
         dpiVal = 300;
         dpiInput.value = 300;
     </script>
+    <!-- Back Button -->
+    <a href="/" class="floating-back-btn" title="Back to Home">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+    </a>
 </body>
 
 </html>
